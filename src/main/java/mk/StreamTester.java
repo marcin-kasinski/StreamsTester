@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -25,77 +26,9 @@ import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-public class StreamTester {
+public class StreamTester extends JavaStreamsTesterAbstract{
 
 	private static Logger log = LoggerFactory.getLogger(StreamTester.class);
-
-	public static void javaStreamsTester() throws InterruptedException {
-
-		System.out.println("");
-
-		System.out.println("javaStreamsTester START");
-		List<Fruit> fruits = new ArrayList();
-		List<Fruit2> targetfruits = new ArrayList();
-		
-		for(int i=0;i<20;i++)
-		{
-			fruits.add(new Fruit(i, "F"+i));
-		}
-
-		
-		
-		System.out.println("\njavaStreamsTester Listing START");
-
-		fruits.forEach(fruit -> {
-			System.out.println(""+fruit.getClass().getName()+" / "+fruit.name);
-		});
-		System.out.println("javaStreamsTester Listing END\n");
-
-		System.out.println("Converting START\n");
-
-		Stream<Fruit2> newFruits = fruits.stream()
-				
-				.filter(
-						
-						  (s) -> {
-		    				  
-		    				  log.info("s.data().toString() "+s.index);
-		    				  return s.index%2==0;}
-
-//		    			  s -> s.data().getSpanTraceId().equals(id)
-		    			
-						
-						
-						)
-				
-				
-				.map(fruit -> {
-			fruit.name += "s";
-			//return fruit;
-			return new Fruit2(fruit.name);
-		});
-		System.out.println("Converting END\n");
-
-		System.out.println("\njavaStreamsTester Listing target START");
-
-		targetfruits= newFruits.collect(Collectors.toList());
-		System.out.println("javaStreamsTester targetfruits.size() "+targetfruits.size());
-
-		/*
-		newFruits.forEach(fruit -> {
-			System.out.println(""+fruit.getClass().getName()+" / "+fruit.name2);
-		});
-		 */
-
-		targetfruits.forEach(fruit -> {
-			System.out.println(""+fruit.getClass().getName()+" / "+fruit.name2);
-		});
-
-		System.out.println("javaStreamsTester Listing END\n");
-
-		System.out.println("javaStreamsTester END");
-
-	}
 
 	public static void consumerTester3() throws InterruptedException {
 
@@ -107,7 +40,7 @@ public class StreamTester {
 
 		// Consumer to display a list of integers
 		Consumer<List<Integer>> dispList = list -> list.stream().forEach(a -> System.out.print(a + " "));
-//        System.out.println(); 
+//        log.info(); 
 
 		List<Integer> list = new ArrayList<Integer>();
 		list.add(2);
@@ -116,15 +49,15 @@ public class StreamTester {
 
 		// using addThen()
 		try {
-			System.out.println("A1");
+			log.info("A1");
 			// dispList.andThen(modify).accept(list);
 			dispList.andThen(modify).accept(list);
-			System.out.println();
-			System.out.println("A2");
+
+			log.info("A2");
 			modify.andThen(dispList).accept(list);
 			;
 		} catch (Exception e) {
-			System.out.println("Exception: " + e);
+			log.info("Exception: " + e);
 		}
 	}
 
@@ -151,7 +84,7 @@ public class StreamTester {
 
 	public static void consumerTester() throws InterruptedException {
 		// Consumer to display a number
-		Consumer<Integer> display = a -> System.out.println(a);
+		Consumer<Integer> display = a -> log.info("" + a);
 
 		// Implement display using accept()
 		display.accept(10);
@@ -163,17 +96,17 @@ public class StreamTester {
 		};
 
 		// Consumer to display a list of numbers
-		Consumer<List<Integer>> dispList = list -> list.stream().forEach(a -> System.out.println(">[" + a + "]"));
+		Consumer<List<Integer>> dispList = list -> list.stream().forEach(a -> log.info(">[" + a + "]"));
 
 		List<Integer> list = new ArrayList<Integer>();
 		list.add(2);
 		list.add(1);
 		list.add(3);
 
-		System.out.println("xxx");
+		log.info("xxx");
 		// Implement modify using accept()
 		modify.accept(list);
-		System.out.println("yyy");
+		log.info("yyy");
 
 		// Implement dispList using accept()
 		dispList.accept(list);
@@ -295,7 +228,7 @@ public class StreamTester {
 		});
 
 		fibonacciGenerator.take(10).collectList().subscribe(t -> {
-			System.out.println(t);
+			log.info("" + t);
 		});
 
 		Flux<Tuple2<Long, Object>> fibonacciGenerator2 = Flux
@@ -305,11 +238,11 @@ public class StreamTester {
 				}).index();
 
 		/*
-		 * fibonacciGenerator2.take(10).collectList().subscribe(t -> {
-		 * System.out.println( t.get(0).getT1() ); });
+		 * fibonacciGenerator2.take(10).collectList().subscribe(t -> { log.info(
+		 * t.get(0).getT1() ); });
 		 */
 		fibonacciGenerator2.subscribe(t -> {
-			System.out.println(t.getT1() + " / " + t.getT2());
+			log.info(t.getT1() + " / " + t.getT2());
 
 			try {
 				Thread.sleep(1000);
@@ -404,8 +337,10 @@ public class StreamTester {
 		// StreamTester.fibonacciStream();
 		// StreamTester.consumerTester();
 		// StreamTester.consumerTester2();
-		StreamTester.consumerTester3();
-		StreamTester.javaStreamsTester();
+		// StreamTester.consumerTester3();
+		// StreamTester.javaStreamsTester();
+		// StreamTester.javaStreamsTester2();
+		StreamTester.javaStreamsTester3();
 	}
 
 }
